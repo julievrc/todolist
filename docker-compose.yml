@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      - API_URL=http://api:5001
+    depends_on:
+      - api
+    networks:
+      - todo-network
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=todouser
+      - MYSQL_PASSWORD=todopassword
+      - MYSQL_DB=tododb
+      - SECRET_KEY=your_secure_secret_key
+      - MOCK_TRANSLATE=true
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mysql
+    networks:
+      - todo-network
+    restart: unless-stopped
+    command: ["python", "api_backend_mysql.py"]
+
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=tododb
+      - MYSQL_USER=todouser
+      - MYSQL_PASSWORD=todopassword
+    ports:
+      - "3307:3306"
+    networks:
+      - todo-network
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+
+networks:
+  todo-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local

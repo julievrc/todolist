@@ -3,11 +3,15 @@ import requests
 import os
 
 app = Flask(__name__)
-API_URL = os.environ.get('API_URL', 'http://localhost:5001')
+API_URL = os.environ.get('API_URL', 'http://localhost:5050')
 
 @app.route("/")
 def show_list():
     return render_template("index.html")
+
+@app.route("/test")
+def test_page():
+    return render_template("test.html")
 
 @app.route("/health")
 def health_check():

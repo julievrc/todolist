@@ -187,7 +187,7 @@
 
     <script>
         // API endpoint configuration - adjust based on your deployment
-        const API_URL = 'http://localhost:5001'; // Change this to your API endpoint
+        const API_URL = 'http://localhost:5050'; // Updated to match your backend port
 
         let currentTasks = [];
         let currentUser = null;
@@ -244,6 +244,7 @@
             const email = $('#login-email').val();
             const password = $('#login-password').val();
 
+            console.log(`Sending login request to: ${API_URL}/api/login`);
             fetch(`${API_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -273,6 +274,7 @@
             const email = $('#register-email').val();
             const password = $('#register-password').val();
 
+            console.log(`Sending registration request to: ${API_URL}/api/register`);
             fetch(`${API_URL}/api/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

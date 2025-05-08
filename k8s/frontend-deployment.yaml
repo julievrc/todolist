@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: todo-frontend
-        image: ${DOCKER_REGISTRY}/todo-frontend:latest  # Replace with your actual image
+        image: gcr.io/trusty-shine-453002-b9/todolist:latest
         ports:
         - containerPort: 80
         env:
@@ -22,11 +22,11 @@ spec:
           value: http://todo-api:5001
         resources:
           limits:
-            cpu: 300m
-            memory: 256Mi
-          requests:
-            cpu: 100m
+            cpu: 50m
             memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
         livenessProbe:
           httpGet:
             path: /health
@@ -76,4 +76,4 @@ spec:
           service:
             name: todo-api
             port:
-              number: 5001
+              number: 5050

@@ -6,9 +6,15 @@ import datetime
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
+from dotenv import load_dotenv
 from google.cloud import translate_v2 as translate
+from flask_cors import CORS
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key')
 DATABASE = 'todolist.db'
 
@@ -197,11 +203,19 @@ def translate_text(current_user):
         return jsonify({'message': 'Text and target language are required'}), 400
     
     try:
+        # Initialize the Translation client with explicit credentials
         translate_client = translate.Client()
+        
+        # Log translation attempt for debugging
+        print(f"Translating text: '{data['text']}' to language '{data['target_language']}'")
+        
         result = translate_client.translate(
             data['text'],
             target_language=data['target_language']
         )
+        
+        # Log successful translation
+        print(f"Translation successful: '{result['translatedText']}'")
         
         return jsonify({
             'original_text': data['text'],
@@ -210,6 +224,8 @@ def translate_text(current_user):
             'target_language': data['target_language']
         })
     except Exception as e:
+        # Log the error for debugging
+        print(f"Translation error: {str(e)}")
         return jsonify({'message': f'Translation error: {str(e)}'}), 500
 
 @app.route("/api/user", methods=['GET'])
@@ -221,9 +237,19 @@ def get_user_profile(current_user):
         'email': current_user['email']
     })
 
+@app.route("/health")
+def health_check():
+    """Health check endpoint for Kubernetes liveness probe."""
+    try:
+        # Test database connection
+        db = get_db()
+        return jsonify({"status": "healthy", "db_connection": "ok"}), 200
+    except Exception as e:
+        return jsonify({"status": "unhealthy", "error": str(e)}), 500
+
 # Initialize database when app starts
 with app.app_context():
     init_db()
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", port=5001)
+    app.run("0.0.0.0", port=5050)

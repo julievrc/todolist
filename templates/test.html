@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+</head>
+<body>
+    <h1>API Test</h1>
+    <button id="test-api">Test API</button>
+    <pre id="result"></pre>
+
+    <script>
+        const API_URL = 'http://localhost:5050';
+        
+        $(document).ready(function() {
+            $('#test-api').click(function() {
+                console.log(`Testing API at ${API_URL}/health`);
+                
+                fetch(`${API_URL}/health`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('API response:', data);
+                        $('#result').text(JSON.stringify(data, null, 2));
+                    })
+                    .catch(error => {
+                        console.error('API error:', error);
+                        $('#result').text('Error: ' + error.message);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

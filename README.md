@@ -162,6 +162,24 @@ Body: { "text": "Task description", "target_language": "fr" }
 - Database credentials stored in secrets
 - Principle of least privilege for all service accounts
 
+### Setting Up Credentials
+
+**Important**: This project requires Google Cloud credentials for the translation feature to work.
+
+1. Create a service account in Google Cloud with Translation API access
+2. Download the service account key JSON file
+3. Rename it to `google-credentials.json` and place it in the project root
+4. For Kubernetes deployment:
+   ```bash
+   # Create the Google credentials secret
+   kubectl create secret generic google-translate-creds --from-file=google-credentials.json=./google-credentials.json
+   
+   # Create API secrets
+   kubectl create secret generic api-secrets --from-literal=secret-key=your_secure_secret_key
+   ```
+
+5. For local development, copy `.env.example` to `.env` and update with your credentials
+
 ## Multi-Cloud Architecture
 
 This application is designed to run across multiple cloud providers (GCP and AWS) for high availability and disaster recovery. See `multi-cloud-integration.md` for detailed architecture documentation.

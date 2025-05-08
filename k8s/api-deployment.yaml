@@ -4,14 +4,14 @@ metadata:
   name: api-secrets
 type: Opaque
 data:
-  secret-key: eW91cl9zZWN1cmVfc2VjcmV0X2tleQ==  # your_secure_secret_key (base64 encoded)
+  secret-key: eW91cl9zZWN1cmVfc2VjcmV0X2tleQ== 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: todo-api
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: todo-api
@@ -22,9 +22,9 @@ spec:
     spec:
       containers:
       - name: todo-api
-        image: ${DOCKER_REGISTRY}/todo-api:latest  # Replace with your actual image
+        image: gcr.io/trusty-shine-453002-b9/todolist-api:latest
         ports:
-        - containerPort: 5001
+        - containerPort: 5050
         env:
         - name: MYSQL_HOST
           value: mysql
@@ -42,28 +42,29 @@ spec:
             secretKeyRef:
               name: api-secrets
               key: secret-key
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /app/google-creds/google-credentials.json
         volumeMounts:
         - name: google-creds
-          mountPath: /app/google-credentials.json
-          subPath: google-credentials.json
+          mountPath: /app/google-creds
           readOnly: true
         resources:
           limits:
-            cpu: 500m
-            memory: 512Mi
+            cpu: 50m
+            memory: 128Mi
           requests:
-            cpu: 250m
-            memory: 256Mi
+            cpu: 10m
+            memory: 64Mi
         livenessProbe:
           httpGet:
             path: /health
-            port: 5001
+            port: 5050
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: 5001
+            port: 5050
           initialDelaySeconds: 5
           periodSeconds: 5
       volumes:
@@ -79,6 +80,6 @@ spec:
   selector:
     app: todo-api
   ports:
-  - port: 5001
-    targetPort: 5001
+  - port: 5050      
+    targetPort: 5050    
   type: ClusterIP
